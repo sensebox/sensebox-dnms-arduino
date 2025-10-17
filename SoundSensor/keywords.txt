@@ -1,0 +1,6 @@
+SoundSensor	KEYWORD1
+begin	KEYWORD2
+update	KEYWORD2
+average	KEYWORD2
+min	KEYWORD2
+max	KEYWORD2
