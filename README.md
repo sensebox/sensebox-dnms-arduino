@@ -16,14 +16,14 @@ Dieses Projekt besteht aus drei Hauptkomponenten, die zusammen einen Lautstärke
    - `SenseBox-Config-AP.zip` auf gleiche Weise
 
 2. **Abhängigkeiten:**
+   Diese Abhängigkeiten müssen noch über den Arduino Library Manager heruntergelaen werden !
 
    - ESP Async WebServer
    - ArduinoJson
-   - HTTPClient (bei ESP32 enthalten)
 
 3. **Sketch laden:**
-   - Öffne `BasicConfig.ino`
-   - Lade auf ESP32-Board
+   - Öffne `senseBox_dnms.ino`
+   - Auf die senseBox-MCU-S2 per Arduion hochladen
 
 ## Verwendung
 
