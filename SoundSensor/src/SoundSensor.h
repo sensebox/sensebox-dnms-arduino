@@ -9,9 +9,9 @@ public:
     SoundSensor();
     void begin();
     void update();
-    int average();
-    int min();
-    int max();
+    float average();
+    float min();
+    float max();
 
 private:
     float _laeq = 0.0;

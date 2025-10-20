@@ -31,16 +31,16 @@ void SoundSensor::update() {
     _getLeqValues(_laeq, _la_min, _la_max);
 }
 
-int SoundSensor::average() {
-    return (int)_laeq;
+float SoundSensor::average() {
+    return _laeq;
 }
 
-int SoundSensor::min() {
-    return (int)_la_min;
+float SoundSensor::min() {
+    return _la_min;
 }
 
-int SoundSensor::max() {
-    return (int)_la_max;
+float SoundSensor::max() {
+    return _la_max;
 }
 
 bool SoundSensor::_getLeqValues(float &leq, float &min, float &max) {
