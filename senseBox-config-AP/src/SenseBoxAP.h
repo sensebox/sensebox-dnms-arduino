@@ -30,11 +30,20 @@ private:
     String _sensorId1;
     String _sensorId2;
     String _sensorId3;
+    bool _mqttEnable;
+    String _mqttHost;
+    String _mqttPort;
+    String _mqttUser;
+    String _mqttPass;
+    String _mqttTopic;
+    String _mqttFieldName;
     
     void _readWiFi();
     void _readIds();
+    void _readMqtt();
     void _updateWiFiConnection(String newSSID, String newPassword);
     void _updateIds(String senseboxId, String sensorId1, String sensorId2, String sensorId3);
+    void _updateMqtt(bool mqttEnable, String mqttHost, String mqttPort, String mqttUser, String mqttPass, String mqttTopic, String mqttFieldName);
     String _buildHTMLString();
     String _buildSaveString();
     String _buildIdsSaveString();

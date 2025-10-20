@@ -12,6 +12,7 @@ void SenseBoxAP::begin() {
     WiFi.softAP(_apSsid.c_str(), _apPassword.c_str());
     _readWiFi();
     _readIds();
+    _readMqtt();
     _setupRoutes();
     _server.begin();
     
@@ -27,6 +28,7 @@ void SenseBoxAP::begin(const char* apSsid, const char* apPassword) {
     WiFi.softAP(_apSsid.c_str(), _apPassword.c_str());
     _readWiFi();
     _readIds();
+    _readMqtt();
     _setupRoutes();
     _server.begin();
     
@@ -53,6 +55,18 @@ void SenseBoxAP::_readIds() {
     _preferences.end();
 }
 
+void SenseBoxAP::_readMqtt() {
+    _preferences.begin("mqtt_storage", true);
+    _mqttEnable = _preferences.getBool("mqtt_enable", false);
+    _mqttHost = _preferences.getString("mqtt_host", "broker.hivemq.com");
+    _mqttPort = _preferences.getString("mqtt_port", "1883");
+    _mqttUser = _preferences.getString("mqtt_user", "");
+    _mqttPass = _preferences.getString("mqtt_pass", "");
+    _mqttTopic = _preferences.getString("mqtt_topic", "sensebox/data");
+    _mqttFieldName = _preferences.getString("mqtt_field_name", "loudness");
+    _preferences.end();
+}
+
 void SenseBoxAP::_updateWiFiConnection(String newSSID, String newPassword) {
     _preferences.begin("wifi_storage", false);
     _preferences.putString("ssid", newSSID);
@@ -66,6 +80,18 @@ void SenseBoxAP::_updateIds(String senseboxId, String sensorId1, String sensorId
     _preferences.putString("loudness_min", sensorId1);
     _preferences.putString("loudness_max", sensorId2);
     _preferences.putString("loudness_avg", sensorId3);
+    _preferences.end();
+}
+
+void SenseBoxAP::_updateMqtt(bool mqttEnable, String mqttHost, String mqttPort, String mqttUser, String mqttPass, String mqttTopic, String mqttFieldName) {
+    _preferences.begin("mqtt_storage", false);
+    _preferences.putBool("mqtt_enable", mqttEnable);
+    _preferences.putString("mqtt_host", mqttHost);
+    _preferences.putString("mqtt_port", mqttPort);
+    _preferences.putString("mqtt_user", mqttUser);
+    _preferences.putString("mqtt_pass", mqttPass);
+    _preferences.putString("mqtt_topic", mqttTopic);
+    _preferences.putString("mqtt_field_name", mqttFieldName);
     _preferences.end();
 }
 
@@ -123,6 +149,23 @@ String SenseBoxAP::_buildHTMLString() {
     html += "<label for='sensor_id_3'>Lautstärke (Avg):</label>";
     html += "<input type='text' id='sensor_id_3' name='sensor_id_3' value='" + _sensorId3 + "' required>";
     
+    html += "<h2>MQTT Einstellungen</h2>";
+
+    html += "<label for='mqtt_enable'>MQTT Aktivieren:</label>";
+    html += "<input type='checkbox' id='mqtt_enable' name='mqtt_enable' " + String(_mqttEnable ? "checked" : "") + ">";
+    html += "<label for='mqtt_host'>MQTT Host Name:</label>";
+    html += "<input type='text' id='mqtt_host' name='mqtt_host' value='" + _mqttHost + "'>";
+    html += "<label for='mqtt_port'>MQTT Port:</label>";
+    html += "<input type='text' id='mqtt_port' name='mqtt_port' value='" + _mqttPort + "'>";
+    html += "<label for='mqtt_user'>MQTT Benutzername:</label>";
+    html += "<input type='text' id='mqtt_user' name='mqtt_user' value='" + _mqttUser + "'>";
+    html += "<label for='mqtt_pass'>MQTT Passwort:</label>";
+    html += "<input type='password' id='mqtt_pass' name='mqtt_pass' value='" + _mqttPass + "'>";
+    html += "<label for='mqtt_topic'>MQTT Topic:</label>";
+    html += "<input type='text' id='mqtt_topic' name='mqtt_topic' value='" + _mqttTopic + "'>";
+    html += "<label for='mqtt_field_name'>MQTT Feldname für Messwert:</label>";
+    html += "<input type='text' id='mqtt_field_name' name='mqtt_field_name' value='" + _mqttFieldName + "'>";
+    
     html += "<input type='submit' value='Speichern & Neustarten'>";
     html += "</form>";
     
@@ -141,6 +184,13 @@ String SenseBoxAP::_buildHTMLString() {
     html += "<div class='status-item'><span class='status-label'>Sensor ID 1 (Min):</span> <span class='status-value'>" + _sensorId1 + "</span></div>";
     html += "<div class='status-item'><span class='status-label'>Sensor ID 2 (Max):</span> <span class='status-value'>" + _sensorId2 + "</span></div>";
     html += "<div class='status-item'><span class='status-label'>Sensor ID 3 (Avg):</span> <span class='status-value'>" + _sensorId3 + "</span></div>";
+    html += "<div class='status-item'><span class='status-label'>MQTT Aktiviert:</span> <span class='status-value'>" + String(_mqttEnable ? "Ja" : "Nein") + "</span></div>";
+    html += "<div class='status-item'><span class='status-label'>MQTT Host:</span> <span class='status-value'>" + _mqttHost + "</span></div>";
+    html += "<div class='status-item'><span class='status-label'>MQTT Port:</span> <span class='status-value'>" + _mqttPort + "</span></div>";
+    html += "<div class='status-item'><span class='status-label'>MQTT Benutzername:</span> <span class='status-value'>" + _mqttUser + "</span></div>";
+    html += "<div class='status-item'><span class='status-label'>MQTT Passwort:</span> <span class='status-value'>" + _mqttPass + "</span></div>";
+    html += "<div class='status-item'><span class='status-label'>MQTT Topic</span> <span class='status-value'>" + _mqttTopic + "</span></div>";
+    html += "<div class='status-item'><span class='status-label'>MQTT Feldname:</span> <span class='status-value'>" + _mqttFieldName + "</span></div>";
     html += "</div>";
     
     html += "</div>";
@@ -216,6 +266,15 @@ void SenseBoxAP::_setupRoutes() {
             request->arg("sensor_id_2"),
             request->arg("sensor_id_3")
         );
+        _updateMqtt(
+            request->hasArg("mqtt_enable") ? true : false,
+            request->arg("mqtt_host"),
+            request->arg("mqtt_port"),
+            request->arg("mqtt_user"),
+            request->arg("mqtt_pass"),
+            request->arg("mqtt_topic"),
+            request->arg("mqtt_field_name")
+        );
         String saveHtml = _buildSaveString();
         request->send(200, "text/html", saveHtml);
     });
@@ -226,6 +285,15 @@ void SenseBoxAP::_setupRoutes() {
             request->arg("sensor_id_1"),
             request->arg("sensor_id_2"),
             request->arg("sensor_id_3")
+        );
+        _updateMqtt(
+            request->hasArg("mqtt_enable") ? true : false,
+            request->arg("mqtt_host"),
+            request->arg("mqtt_port"),
+            request->arg("mqtt_user"),
+            request->arg("mqtt_pass"),
+            request->arg("mqtt_topic"),
+            request->arg("mqtt_field_name")
         );
         String html = _buildIdsSaveString();
         request->send(200, "text/html", html);
