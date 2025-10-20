@@ -1,11 +1,11 @@
 #include "SenseBoxAP.h"
-//#include "SoundSensor.h"
+#include "SoundSensor.h"
 
 #include <math.h>
 #include <WiFi.h>
 #include <PubSubClient.h>
 
-//SoundSensor sensor;
+SoundSensor sensor;
 const int OSM_MEASUREMENT_INTERVAL = 60000; // in milliseconds
 SenseBoxAP configAP;
 unsigned long lastOsmMeasurement = 0;
@@ -25,7 +25,7 @@ void setup() {
   configAP.begin("senseBox-Access-Point", "12345678");
   delay(1000);
   mqttAssureConnected();
-  //sensor.begin();
+  sensor.begin();
 }
 
 void loop() {
@@ -39,16 +39,12 @@ void loop() {
 
   if (millis() - lastMqttMeasurement >= MQTT_MEASUREMENT_INTERVAL) {
     lastMqttMeasurement = millis();
-    //sensor.update();
+    sensor.update();
   
-    //float val_avg = sensor.average();
-    //float val_min = sensor.min();
-    //float val_max = sensor.max();
+    float val_avg = sensor.average();
+    float val_min = sensor.min();
+    float val_max = sensor.max();
       
-    //sendToOpenSenseMap(val_min, val_max, val_avg);
-    float val_avg = random(30, 90); // Placeholder for actual sensor reading
-    float val_min = val_avg - random(5, 15);
-    float val_max = val_avg + random(5, 15);
     sendToMQTT(val_avg);
 
     log_min = (n_measurement == 0) ? val_min : min(log_min, val_min);
