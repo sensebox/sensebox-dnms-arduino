@@ -1,6 +1,6 @@
-#include "SoundSensor.h"
+#include "DNMSI2C.h"
 
-SoundSensor sensor;
+DNMSI2C sensor;
 
 void setup() {
   Serial.begin(9600);

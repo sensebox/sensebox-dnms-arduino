@@ -2,7 +2,7 @@
 
 ## Überblick
 
-Der senseBox Lautstärke-Logger kombiniert die SoundSensor- und Config-AP-Bibliotheken, um kontinuierlich Lautstärke-Messwerte zu erfassen und an die OpenSenseMap zu senden. Der Sketch ermöglicht eine einfache Konfiguration über eine Web-Oberfläche.
+Der senseBox Lautstärke-Logger kombiniert die DNMSI2C- und Config-AP-Bibliotheken, um kontinuierlich Lautstärke-Messwerte zu erfassen und an die OpenSenseMap zu senden. Der Sketch ermöglicht eine einfache Konfiguration über eine Web-Oberfläche.
 
 ## Funktionen
 

@@ -1,7 +1,7 @@
 #include "SenseBoxAP.h"
-#include "SoundSensor.h"
+#include "DNMSI2C.h"
 
-SoundSensor sensor;
+DNMSI2C sensor;
 const int MEASUREMENT_INTERVAL = 60;
 SenseBoxAP configAP;
 unsigned long lastMeasurement = 0;

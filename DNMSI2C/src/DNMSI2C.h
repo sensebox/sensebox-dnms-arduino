@@ -1,12 +1,12 @@
-#ifndef SoundSensor_h
-#define SoundSensor_h
+#ifndef DNMSI2C_h
+#define DNMSI2C_h
 
 #include <Arduino.h>
 #include <Wire.h>
 
-class SoundSensor {
+class DNMSI2C {
 public:
-    SoundSensor();
+    DNMSI2C();
     void begin();
     void update();
     int average();

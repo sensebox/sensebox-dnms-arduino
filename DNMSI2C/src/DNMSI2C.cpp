@@ -1,4 +1,4 @@
-#include "SoundSensor.h"
+#include "DNMSI2C.h"
 
 // I2C Adresse
 #define DNMS_I2C_ADDRESS          0x55
@@ -17,9 +17,9 @@
 #define CRC8_POLYNOMIAL           0x31
 #define CRC8_INIT                 0xFF
 
-SoundSensor::SoundSensor() {}
+DNMSI2C::DNMSI2C() {}
 
-void SoundSensor::begin() {
+void DNMSI2C::begin() {
     Wire.begin(PIN_QWIIC_SDA, PIN_QWIIC_SCL);
     Wire.setClock(100000);
     Wire.setTimeout(50);
@@ -27,23 +27,23 @@ void SoundSensor::begin() {
     delay(1000); // Warm-up
 }
 
-void SoundSensor::update() {
+void DNMSI2C::update() {
     _getLeqValues(_laeq, _la_min, _la_max);
 }
 
-int SoundSensor::average() {
+int DNMSI2C::average() {
     return (int)_laeq;
 }
 
-int SoundSensor::min() {
+int DNMSI2C::min() {
     return (int)_la_min;
 }
 
-int SoundSensor::max() {
+int DNMSI2C::max() {
     return (int)_la_max;
 }
 
-bool SoundSensor::_getLeqValues(float &leq, float &min, float &max) {
+bool DNMSI2C::_getLeqValues(float &leq, float &min, float &max) {
     uint32_t now = millis();
     if (now < _next_calc) {
         return false; 
@@ -75,7 +75,7 @@ bool SoundSensor::_getLeqValues(float &leq, float &min, float &max) {
     }
 }
 
-bool SoundSensor::_writeCommand(uint16_t cmd) {
+bool DNMSI2C::_writeCommand(uint16_t cmd) {
     Wire.beginTransmission(DNMS_I2C_ADDRESS);
     Wire.write((uint8_t)(cmd >> 8));
     Wire.write((uint8_t)(cmd & 0xFF));
@@ -83,7 +83,7 @@ bool SoundSensor::_writeCommand(uint16_t cmd) {
     return err == 0;
 }
 
-bool SoundSensor::_requestBytes(size_t n, uint8_t *data) {
+bool DNMSI2C::_requestBytes(size_t n, uint8_t *data) {
     size_t got = Wire.requestFrom((int)DNMS_I2C_ADDRESS, (int)n);
     if (got < n) return false;
     for (size_t i = 0; i < n; ++i) {
@@ -92,7 +92,7 @@ bool SoundSensor::_requestBytes(size_t n, uint8_t *data) {
     return true;
 }
 
-bool SoundSensor::_readDataReady(uint16_t cmd, uint16_t &ready) {
+bool DNMSI2C::_readDataReady(uint16_t cmd, uint16_t &ready) {
     if (!_writeCommand(cmd)) return false;
 
     uint8_t buf[3];
@@ -102,7 +102,7 @@ bool SoundSensor::_readDataReady(uint16_t cmd, uint16_t &ready) {
     return true;
 }
 
-bool SoundSensor::_readFloat6(const uint8_t *p, float &out) {
+bool DNMSI2C::_readFloat6(const uint8_t *p, float &out) {
     const uint8_t msw[2] = { p[0], p[1] }; const uint8_t crc1 = p[2];
     const uint8_t lsw[2] = { p[3], p[4] }; const uint8_t crc2 = p[5];
 
@@ -114,14 +114,14 @@ bool SoundSensor::_readFloat6(const uint8_t *p, float &out) {
     return true;
 }
 
-bool SoundSensor::_readLeqTriplet(uint16_t cmd, float &leq, float &min, float &max) {
+bool DNMSI2C::_readLeqTriplet(uint16_t cmd, float &leq, float &min, float &max) {
     if (!_writeCommand(cmd)) return false;
     uint8_t raw[18];
     if (!_requestBytes(sizeof raw, raw)) return false;
     return _readFloat6(raw+0, leq) && _readFloat6(raw+6, min) && _readFloat6(raw+12, max);
 }
 
-uint8_t SoundSensor::_crc8_word(const uint8_t *data) {
+uint8_t DNMSI2C::_crc8_word(const uint8_t *data) {
     uint16_t current_byte;
     uint8_t crc = CRC8_INIT;
     uint8_t crc_bit;
