@@ -1,8 +1,8 @@
-# SoundSensor Bibliothek
+# DNMSI2C Bibliothek
 
 ## Überblick
 
-Die SoundSensor Bibliothek ermöglicht das Auslesen von Lautstärke-Werten (dBA) von einem DNMS-Teensy über I2C. Sie liefert Mittelwert, Minimum und Maximum in einem konfigurierbaren Intervall.
+Die DNMSI2C Bibliothek ermöglicht das Auslesen von Lautstärke-Werten (dBA) von einem DNMS-Teensy über I2C. Sie liefert Mittelwert, Minimum und Maximum in einem konfigurierbaren Intervall.
 
 ## Funktionen
 
@@ -20,9 +20,9 @@ Die SoundSensor Bibliothek ermöglicht das Auslesen von Lautstärke-Werten (dBA)
 ## Verwendung
 
 ```cpp
-#include "SoundSensor.h"
+#include "DNMSI2C.h"
 
-SoundSensor sensor;
+DNMSI2C sensor;
 
 void setup() {
   sensor.begin();

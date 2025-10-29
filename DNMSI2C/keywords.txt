@@ -1,4 +1,4 @@
-SoundSensor	KEYWORD1
+DNMSI2C	KEYWORD1
 begin	KEYWORD2
 update	KEYWORD2
 average	KEYWORD2
